@@ -64,12 +64,6 @@ class codigo():
             samp_norm=np.array(samp_norm).reshape(1,-1)
             return samp_norm
 
-        def desnormalizar_muestra(muestra_normalizada, matriz):
-            samp_desn =[]
-            for i in range(0, matriz.shape[1]):
-                ans = ( (matriz.iloc[:, i].max() - matriz.iloc[:, i].min()) * muestra_normalizada[i]) +  matriz.iloc[:, i].min()
-                samp_desn.append(ans)
-            return samp_desn
 
         vector_entrada_validacion={
                                     'DurationDeepVacuum_1mbar' : parameter['DurationDeepVacuum_1mbar'],

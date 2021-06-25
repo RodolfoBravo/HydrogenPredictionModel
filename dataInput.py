@@ -22,4 +22,4 @@ class Input:
         df1.drop(index = dp, inplace=True)
         df1['clase'] = np.where( df1.HidrógenoPPM < 1.5, 1,0) # 1 ok , 0 nok
         clase_gpb= df1.groupby('clase').mean()
-            return df1
+        return df1
