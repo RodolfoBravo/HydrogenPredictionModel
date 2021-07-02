@@ -1,9 +1,10 @@
 import pandas as pd
+import numpy as np
 class Input:
     def __init__(self):
         pass
 
-    def leerdatos(path):
+    def leerdatos(self,path):
         df = pd.read_excel(path)
 
         #Se realiza un data preprocessing para asegurar calidad en los datos
@@ -16,7 +17,7 @@ class Input:
         df.dropna(inplace=True)
         return df
 
-    def preprocesamiento(df):
+    def preprocesamiento(self,df):
         df1 = df.iloc[:, 6:]
         dp = (df1[df1.Prevaciado<0]).index.to_list()
         df1.drop(index = dp, inplace=True)

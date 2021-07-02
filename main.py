@@ -13,15 +13,14 @@ class codigo():
         from sklearn.model_selection import train_test_split
         from sklearn.preprocessing import MinMaxScaler
         from sklearn.neighbors import KNeighborsRegressor
+        import json
 
         listadata = []
         #Leo los datos de la BD. Esta BD es el resultado de unir varias BD mandadas en diferentes tiempos, diferentes  variables y sin calidad
-        path = "C:\Users\Rodo\Desktop\data.xlsx"
-        inputdata = input()
+        path = "C:/Users/ECON-IT/Documents/HydrogenPredictionModel/data.xlsx"
+        inputdata = Input()
         df = inputdata.leerdatos(path)
-
         df1 = inputdata.preprocesamiento(df)
-
         #Leo mis caracteristicas (X) y mi salida (Y)
         feat = [2, 3, 6, 7, 9, 18, 21, 25]
         X = df1.iloc[:,:-1].drop(columns='HidrógenoPPM')
@@ -66,19 +65,18 @@ class codigo():
 
 
         vector_entrada_validacion={
-                                    'DurationDeepVacuum_1mbar' : parameter['DurationDeepVacuum_1mbar'],
-                                    'OffGasH': parameter[''],
-                                    'OffGasCO2' : parameter[''],
-                                    'kf_value' : parameter[''],
-                                    'Factor_Kf_Temp': parameter[''],
-                                    'Tapping': parameter[''],
-                                    'VDDuration TOTAL' : parameter[''],
-                                    'VDPressureMin' : parameter[''],
+                                    'DurationDeepVacuum_1mbar' : parameter['vacum_calc'],
+                                    'OffGasH': parameter['offgas_h2'],
+                                    'OffGasCO2' : parameter['offgas_co2'],
+                                    'kf_value' : parameter['hidrys_kf'],
+                                    'Factor_Kf_Temp': parameter['kf_temp'],
+                                    'Tapping': parameter['peso_acero_olla'],
+                                    'VDDuration TOTAL' : parameter['duracion_total'],
+                                    'VDPressureMin' : parameter['val_vacio_presion'],
                                     }
         #separo en features y output
         X_bruto = np.array(list(vector_entrada_validacion.values()) ).reshape(1,-1) #1 x 8
         # y_bruto = np.array(list(vector_entrada_validacion.values())[-1]).reshape(1,-1) #1x1
-
         #normalizo
         X_norm = normalizar_muestra(X_bruto[0], X)
         #y_norm = (y_bruto - y.min()) / (y.max() - y.min())
@@ -87,12 +85,13 @@ class codigo():
         ypred_val = knn.predict(X_norm) #realizo prediccion
         ypred_val_desn = ( (y.max() - y.min()) * ypred_val) +  y.min() #Desnormalizo prediccion
 
-       # print('Valor real: ' + str(y_bruto[0][0]) + ' Valor estimado: '+ str(ypred_val_desn[0][0]) + ' , Residuo de: ' + str(( y_bruto - ypred_val_desn)[0][0]))
-                
-        json = ypred_val_desn.to_json()
+        #print(' Valor estimado: '+ str(ypred_val_desn[0][0]) )
         
+        d = {"r":str(ypred_val_desn)}
+        dataf = json.dumps(d)
+        print (dataf)
        
         #listalistas.to_excel(r'C:/Users/ECON Tech/Desktop/ProyectoFrisa/Resultados_main.xlsx', engine='xlsxwriter')
         #print (listalistas)
         #Instruccion para que se emita un sonido indicando que la ejecucion del programa ha terminado
-        return (json)
+        return (dataf)

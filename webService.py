@@ -7,18 +7,14 @@ app = Flask(__name__)
 def codigoHidrogeno():
     #print(request.json)
     parameter = {
-        "bool": request.json['bool'],
-        "Func": request.json['Func'],
-        "temp": request.json['temp'],
-        "psliquido": request.json['psliquido'],
-        "ppmo": request.json['ppmo'],
-        "CalDolomitica_1LF" : request.json['CalDolomitica_1LF'],
-        "CalSiderurgica_gruesa_1LF" : request.json['CalSiderurgica_gruesa_1LF'],
-        "CalSiderurgica_fina_1LF" : request.json['CalSiderurgica_fina_1LF'],
-        "AlBriqueta_1LF" : request.json['AlBriqueta_1LF'],
-        "AlPosta_1LF" : request.json['AlPosta_1LF'],
-        "FerroSi_gradoC_1LF" : request.json['FerroSi_gradoC_1LF'],
-        "SiMnStd_gradoD_1LF" : request.json['SiMnStd_gradoD_1LF']
+        "vacum_calc" : request.json['vacum_calc'],
+        "offgas_h2" : request.json['offgas_h2'],
+        "offgas_co2" : request.json['offgas_co2'],
+        "hidrys_kf" : request.json['hidrys_kf'],
+        "kf_temp" : request.json['kf_temp'],
+        "peso_acero_olla" : request.json['peso_acero_olla'],
+        "duracion_total" : request.json['duracion_total'],
+        "val_vacio_presion" : request.json['val_vacio_presion']
         }
   
     from main import codigo
