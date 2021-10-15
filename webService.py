@@ -1,9 +1,11 @@
+from performance import Modelperformance
 from flask import Flask, jsonify, request
+import pandas as pd
 
 
-app = Flask(__name__)
+app_ml = Flask(__name__)
 
-@app.route('/calculoHidrogeno', methods=['POST'])
+@app_ml.route('/calculoHidrogeno', methods=['POST'])
 def codigoHidrogeno():
     #print(request.json)
     parameter = {
@@ -19,5 +21,19 @@ def codigoHidrogeno():
     cd = codigo()
     return jsonify({"message":'Datos guardados exitosamente', "resultados":cd.algoritmo(parameter)})
 
-    
-app.run(debug=True, port= 4000)
+@app_ml.route('/performance1', methods=['POST'])
+def performance():
+    path_osv = request.json["path"]
+    print(path_osv)
+    from performance import Modelperformance
+    path_output_summary_vector = path_osv
+    outputsummaryvector= pd.read_csv(path_output_summary_vector)
+    bd_filtrada = Modelperformance.filtro(outputsummaryvector)
+    bd_filtrada_json = bd_filtrada.to_json()
+    resultados, wrong, yield_final , mae, model_use= Modelperformance.metricas(bd_filtrada ,outputsummaryvector)
+    resultados = resultados.to_json()
+
+    return jsonify({"message":'Datos guardados exitosamente', "resultados": resultados, "wrong":wrong,"yield_": yield_final_,"MAE":mae,"model_use":model_use})
+
+
+app_ml.run(debug=True, port= 4000)

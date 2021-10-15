@@ -3,12 +3,14 @@ class codigo():
     def __init__(self):
         pass
 
-    def algoritmo(self, parameter):
+    def algoritmo(self, parameter): #, parameter):
         from dataInput import Input
+        from dicc_dominio import dicc_domain
         import numpy as np
         import pandas as pd
         from sklearn.model_selection import train_test_split
         from sklearn.neighbors import KNeighborsRegressor
+        from sklearn.metrics import mean_absolute_error
         import json
     
 
@@ -23,28 +25,22 @@ class codigo():
             return y_desnormalizada_estimada
 
         #Leo los datos de la BD. Esta BD es el resultado de unir varias BD mandadas en diferentes tiempos, diferentes  variables y sin calidad
-        path = "C:/Users/ECON-IT/Documents/HydrogenPredictionModel - copia/Modelo Hidrogeno Ago-Dic_15-01.xlsx"# "C:/Users/Maria Luisa/OneDrive - ECON Tech/Frisa_Calculo_Hidrogeno/Modelo Hidrogeno Ago-Dic_15-01.xlsx"
+        #"C:\Users\Maria Luisa\OneDrive - ECON Tech\Frisa_Calculo_Hidrogeno\new_features_0309.xlsx"                  ya no ..."C:/Users/Maria Luisa/OneDrive - ECON Tech/Frisa_Calculo_Hidrogeno/Modelo Hidrogeno Ago-Dic_15-01.xlsx"
+        path = "C:/Users/ECON-IT/Documents/HydrogenPredictionModel/new_features_0309.xlsx"#"C:/Users/ECON-IT/Documents/HydrogenPredictionModel - copia/Modelo Hidrogeno Ago-Dic_15-01_mod_02-09.xlsx"# C:/Users/ECON-IT/Documents/HydrogenPredictionModel - copia/Modelo Hidrogeno Ago-Dic_15-01.xlsx
         inputdata = Input()
-        df = inputdata.leerdatos(path)
-        df1 = inputdata.preprocesamiento(df)
-
+        df1 = inputdata.leerdatos(path)
+        
         #Leo mis caracteristicas (X) y mi salida (Y)
         ''' ahora es : 'DurationDeepVacuum_1mbar', 'OffGasH', 'OffGasCO2', 'kf_value', 'Tapping', 'VDPressureMin', 'HidrógenoPPM ....Saque: #saco kf_temp, duracion total,'''
-        feat = [2, 3, 6, 7, 18, 25]
-        X = df1.iloc[:,:-1].drop(columns='HidrógenoPPM')
-        X = X.iloc[:,feat]
+        
+        X = df1.drop(columns='HidrógenoPPM')
         y = df1.HidrógenoPPM
         xy = pd.concat([X,y], axis=1)
 
         #limpiar otra vez la matriz de busqueda
         #defino los rangos de cada variable
-        dict_rng = {'DurationDeepVacuum_1mbar': [xy.loc[:,'DurationDeepVacuum_1mbar' ].min(),xy.loc[:,'DurationDeepVacuum_1mbar' ].max()],
-                    'OffGasH': [xy.loc[:,'OffGasH'].min(),xy.loc[:,'OffGasH'].max()],
-                    'OffGasCO2':[xy.loc[:,'OffGasCO2'].min(),xy.loc[:,'OffGasCO2'].max()],
-                    'kf_value': [xy.loc[:,'kf_value' ].min(),xy.loc[:, 'kf_value'].max()],
-                    'Tapping':[45000,63000],
-                    'VDPressureMin':[xy.loc[:,'VDPressureMin' ].min(),xy.loc[:,'VDPressureMin'].max()],
-                    'HidrógenoPPM': [0.00000 ,2 ] }
+        
+        dict_rng= dicc_domain.dict_rng
 
         def preprocess2(xy, dict_rng):
         #Filtro los datos
@@ -81,7 +77,7 @@ class codigo():
         y_n = (y - y.min() ) /( y.max() - y.min())
    
         #Separo en mi conjunto de entrenamiento y validacion
-        X_train, X_test, y_train, y_test = train_test_split(X_n, y_n, test_size=0.2, random_state=42) # X_train, X_test, y_train, y_test   # (517, 8), (255, 8),(517, 1),(255, 1)
+        X_train, X_test, y_train, y_test = train_test_split(X_n, y_n, test_size=0.2, random_state=74) # X_train, X_test, y_train, y_test   # (517, 8), (255, 8),(517, 1),(255, 1)
 
         #______________Modelo
         nn= 2
@@ -91,7 +87,8 @@ class codigo():
         y_pred= knn.predict(X_test) #Estimo con los datos de test
         y_pred = desnormalizar_y(y, y_pred)
         ytest = y_test * ( y.max() - y.min() ) + y.min()  #valor verdadero desnormalizado
-
+        mae_model = mean_absolute_error(ytest, y_pred)
+    
         #_______________________Leer datos de un evento
         vector_entrada_validacion={
                                     'Vacuum_2mbar_min' : parameter['vacum_calc'],
@@ -157,13 +154,17 @@ class codigo():
                 print (result[0])
                 return result[0]
             else:
-                msg = 'El vector se encuentra fuera de rango de la matriz de busqueda, y por tanto no paso los filtros'
+                msg = 0 #'El vector se encuentra fuera de rango de la matriz de busqueda, y por tanto no paso los filtros'
                 print (msg)
                 return msg
               
         y_estimada_final = realizar_estimacion()
+        mae_model_2 = mae_model 
+        datos_busqueda = xy
 
-        d = {"r": str(y_estimada_final)}
+           
+        d = {"r": str(y_estimada_final), 'mae_model' : str(mae_model_2), 'x_input' : str(x_nueva)}
         data = json.dumps(d)
         print (data)
         return (data)
+

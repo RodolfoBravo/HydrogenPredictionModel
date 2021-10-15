@@ -6,15 +6,11 @@ class Input:
 
     def leerdatos(self,path):
         df = pd.read_excel(path)
-
-        #Se realiza un data preprocessing para asegurar calidad en los datos
-        df.replace({'(null)': np.nan}, inplace=True)
-        # Duración y VDDeepVacuunDuration son iguales
-        df.drop(columns=['Temperatura_al_final_de_vacío_profundo_C', 'HidrógenoDELTA', 'ModeloHidrógeno', 'FechaProducción',
-                        'VDDeepVacuunDuration'], inplace=True)
-        df.drop(columns = ['Consumo_promedio_de_Ar_durante_VD_Nm3','Presión_Promedio_de_Vacío_Profundo_mbar' ], inplace=True)
+        df = df.drop(index = df[df.HidrógenoPPM == 'veo'].index.to_list())
+        df.HidrógenoPPM = df.HidrógenoPPM.astype('float64')
         (df.HidrógenoPPM > 1.5).sum()
         df.dropna(inplace=True)
+        df = df.loc[:,[ 'DurationDeepVacuum_1mbar', 'OffGasH', 'OffGasCO2','kf_value', 'Tapping', 'VDPressureMin','HidrógenoPPM']]
         return df
 
     def preprocesamiento(self,df):
